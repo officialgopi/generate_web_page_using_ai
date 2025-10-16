@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Snake Game (Tailwind & Framer Motion)</title>
+
+    <!-- SEO and Accessibility -->
+    <meta name="description" content="A basic Snake game built using vanilla JavaScript, styled with Tailwind CSS, and enhanced with Framer Motion principles for smooth UI interactions.">
+    <meta name="keywords" content="snake game, javascript, tailwind css, framer motion, html game, responsive">
+
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Framer Motion CDN (Using Popmotion, the core engine of Framer Motion, for vanilla JS animations) -->
+    <!-- Note: Standard Framer Motion CDN is designed for React/Vue. Using Popmotion allows us to utilize the underlying animation principles in vanilla JS. -->
+    <script src="https://unpkg.com/popmotion/dist/popmotion.global.min.js"></script>
+
+    <style>
+        /* Internal CSS for game grid setup and necessary overrides */
+        /* Apply dark theme defaults */
+        body {
+            font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+        }
+
+        #game-board {
+            display: grid;
+            /* Defined dynamically via JS based on BOARD_SIZE, but ensuring initial structure */
+        }
+
+        .cell {
+            width: 100%;
+            height: 100%;
+            /* Use CSS transitions for movement smoothness (Framer Motion philosophy) */
+            transition: background-color 0.1s ease-in-out, transform 0.1s ease-in-out, box-shadow 0.1s ease-in-out;
+        }
+
+        .snake-head {
+            background-color: #2dd4bf; /* Teal 400 */
+            border: 2px solid #06b6d4; /* Cyan 600 */
+            border-radius: 4px;
+            transform: scale(1.05);
+            box-shadow: 0 0 10px rgba(45, 212, 191, 0.7);
+            z-index: 10;
+        }
+
+        .snake-body {
+            background-color: #0d9488; /* Teal 600 */
+            border-radius: 2px;
+        }
+
+        .food {
+            background-color: #f87171; /* Red 400 */
+            border-radius: 50%;
+            animation: pulse-food 1.5s infinite;
+            transform: scale(0.9);
+        }
+
+        @keyframes pulse-food {
+            0%, 100% { transform: scale(0.85); opacity: 1; }
+            50% { transform: scale(1.05); opacity: 0.9; }
+        }
+
+        /* Framer Motion Inspired Button Animation Utility Class */
+        .motion-button {
+            transition: transform 0.1s cubic-bezier(0.17, 0.67, 0.83, 0.67), box-shadow 0.1s ease-out;
+        }
+
+        .motion-button:active {
+            transform: scale(0.95);
+            box-shadow: 0 0 0 0 rgba(0, 0, 0, 0);
+        }
+
+    </style>
+</head>
+
+<body class="bg-gray-900 text-gray-100 min-h-screen flex flex-col items-center p-4">
+
+    <main class="w-full max-w-2xl mx-auto flex flex-col gap-6">
+        
+        <!-- Header and Score Display -->
+        <header class="flex justify-between items-center bg-gray-800 p-4 rounded-xl shadow-lg">
+            <h1 class="text-3xl font-extrabold text-teal-400 tracking-tight">
+                SnakeMotion
+            </h1>
+            <div class="flex items-center gap-4">
+                <p class="text-lg font-semibold text-gray-400">Score:</p>
+                <span id="score" class="text-4xl font-bold text-red-400 transition-all duration-150 ease-out">
+                    0
+                </span>
+            </div>
+        </header>
+
+        <!-- Game Section -->
+        <section aria-label="Snake Game Board" class="relative w-full aspect-square bg-gray-800 rounded-xl shadow-2xl p-2">
+            <div 
+                id="game-board" 
+                class="w-full h-full border-4 border-gray-700 rounded-lg overflow-hidden">
+                <!-- Game cells injected here -->
+            </div>
+
+            <!-- Overlay for Start/Game Over screen -->
+            <div id="game-overlay" class="absolute inset-0 bg-gray-900/90 backdrop-blur-sm flex flex-col justify-center items-center rounded-xl transition-opacity duration-300 ease-in-out">
+                <h2 id="overlay-title" class="text-5xl font-extrabold mb-4 text-teal-400">
+                    Snake Game
+                </h2>
+                <p id="overlay-message" class="text-xl text-gray-300 mb-8">
+                    Press START to begin! Use Arrow Keys to move.
+                </p>
+                <button 
+                    id="start-button" 
+                    class="motion-button bg-teal-500 hover:bg-teal-400 text-gray-900 font-bold py-3 px-8 rounded-full shadow-xl text-lg uppercase transition duration-150 ease-out">
+                    Start Game
+                </button>
+            </div>
+        </section>
+
+        <!-- Controls and Instructions -->
+        <footer class="bg-gray-800 p-4 rounded-xl text-center shadow-lg">
+            <p class="text-sm text-gray-400">
+                Use <span class="font-mono text-teal-300">↑ ↓ ← →</span> keys to control the snake.
+            </p>
+            <p class="text-xs mt-2 text-gray-500">
+                Developed using HTML, Tailwind CSS, and Framer Motion (Popmotion).
+            </p>
+        </footer>
+
+    </main>
+
+    <script>
+        // --------------------------------------------------
+        // GAME CONSTANTS
+        // --------------------------------------------------
+        const BOARD_SIZE = 20; // 20x20 grid
+        const INITIAL_SPEED = 150; // milliseconds per tick
+
+        // --------------------------------------------------
+        // DOM ELEMENTS
+        // --------------------------------------------------
+        const boardElement = document.getElementById('game-board');
+        const scoreElement = document.getElementById('score');
+        const overlayElement = document.getElementById('game-overlay');
+        const overlayTitleElement = document.getElementById('overlay-title');
+        const overlayMessageElement = document.getElementById('overlay-message');
+        const startButton = document.getElementById('start-button');
+
+        // --------------------------------------------------
+        // GAME STATE
+        // --------------------------------------------------
+        let snake = [];
+        let food = {};
+        let direction = 'right';
+        let score = 0;
+        let gameLoopInterval = null;
+        let gameRunning = false;
+        let speed = INITIAL_SPEED;
+        let nextDirection = 'right'; // Buffer for input to prevent instant reversal
+
+        // --------------------------------------------------
+        // UTILITY FUNCTIONS
+        // --------------------------------------------------
+
+        /**
+         * Initializes the grid layout using CSS Grid properties.
+         */
+        function setupBoardGrid() {
+            boardElement.style.gridTemplateColumns = `repeat(${BOARD_SIZE}, 1fr)`;
+            boardElement.style.gridTemplateRows = `repeat(${BOARD_SIZE}, 1fr)`;
+
+            for (let i = 0; i < BOARD_SIZE * BOARD_SIZE; i++) {
+                const cell = document.createElement('div');
+                cell.className = 'cell';
+                cell.id = `cell-${i}`;
+                boardElement.appendChild(cell);
+            }
+        }
+
+        /**
+         * Converts (x, y) coordinates to a single cell index.
+         * @param {number} x
+         * @param {number} y
+         */
+        function coordsToIndex(x, y) {
+            return y * BOARD_SIZE + x;
+        }
+
+        /**
+         * Generates a random coordinate that is not currently occupied by the snake.
+         */
+        function generateFood() {
+            let x, y, index;
+            do {
+                x = Math.floor(Math.random() * BOARD_SIZE);
+                y = Math.floor(Math.random() * BOARD_SIZE);
+                index = coordsToIndex(x, y);
+            } while (snake.some(segment => segment.x === x && segment.y === y));
+            food = { x, y, index };
+        }
+
+        /**
+         * Updates the visual representation of the game board.
+         */
+        function render() {
+            // Reset all cells
+            document.querySelectorAll('.cell').forEach(cell => {
+                cell.className = 'cell';
+            });
+
+            // Render Snake
+            snake.forEach((segment, index) => {
+                const cell = document.getElementById(`cell-${coordsToIndex(segment.x, segment.y)}`);
+                if (cell) {
+                    cell.classList.add('snake-body');
+                    if (index === 0) {
+                        cell.classList.add('snake-head');
+                    }
+                }
+            });
+
+            // Render Food
+            const foodCell = document.getElementById(`cell-${food.index}`);
+            if (foodCell) {
+                foodCell.classList.add('food');
+            }
+
+            // Update score display using Popmotion/Framer-inspired transitions
+            scoreElement.textContent = score;
+            // Small visual 'pop' on score change
+            if (score > (parseInt(scoreElement.dataset.lastScore) || 0)) {
+                 popmotion.styler(scoreElement).set('transform', 'scale(1.1)');
+                 popmotion.tween({ from: 1.1, to: 1.0, duration: 100 }).start(v => {
+                     popmotion.styler(scoreElement).set('transform', `scale(${v})`);
+                 });
+            }
+            scoreElement.dataset.lastScore = score;
+        }
+
+        /**
+         * Main game loop function.
+         */
+        function gameTick() {
+            if (!gameRunning) return;
+
+            direction = nextDirection; // Commit direction change
+
+            const head = snake[0];
+            let newHeadX = head.x;
+            let newHeadY = head.y;
+
+            // Determine new coordinates based on direction
+            switch (direction) {
+                case 'up': newHeadY--; break;
+                case 'down': newHeadY++; break;
+                case 'left': newHeadX--; break;
+                case 'right': newHeadX++; break;
+            }
+
+            const newHead = { x: newHeadX, y: newHeadY };
+
+            // 1. Collision Check (Wall)
+            if (newHeadX < 0 || newHeadX >= BOARD_SIZE || newHeadY < 0 || newHeadY >= BOARD_SIZE) {
+                return gameOver();
+            }
+
+            // 2. Collision Check (Self)
+            if (snake.some(segment => segment.x === newHead.x && segment.y === newHead.y)) {
+                return gameOver();
+            }
+
+            // 3. Move Snake: Add new head
+            snake.unshift(newHead);
+
+            // 4. Food Check
+            if (newHead.x === food.x && newHead.y === food.y) {
+                score += 10;
+                // Don't remove tail (snake grows)
+                generateFood();
+                // Optionally speed up slightly
+                if (score % 50 === 0 && speed > 50) {
+                    speed -= 10;
+                    restartGameLoop(speed);
+                }
+            } else {
+                // Remove tail (normal movement)
+                snake.pop();
+            }
+
+            render();
+        }
+
+        /**
+         * Starts or restarts the game loop with a given speed.
+         * @param {number} newSpeed
+         */
+        function restartGameLoop(newSpeed) {
+            if (gameLoopInterval) {
+                clearInterval(gameLoopInterval);
+            }
+            speed = newSpeed;
+            gameLoopInterval = setInterval(gameTick, speed);
+        }
+
+        /**
+         * Initializes the game state.
+         */
+        function initGame() {
+            snake = [{ x: 5, y: 10 }, { x: 4, y: 10 }, { x: 3, y: 10 }];
+            direction = 'right';
+            nextDirection = 'right';
+            score = 0;
+            speed = INITIAL_SPEED;
+            scoreElement.textContent = '0';
+            generateFood();
+            render();
+        }
+
+        /**
+         * Handles the game start process.
+         */
+        function startGame() {
+            initGame();
+            gameRunning = true;
+            overlayElement.style.opacity = '0';
+            overlayElement.style.pointerEvents = 'none';
+            restartGameLoop(speed);
+        }
+
+        /**
+         * Handles game over state.
+         */
+        function gameOver() {
+            gameRunning = false;
+            clearInterval(gameLoopInterval);
+            
+            overlayTitleElement.textContent = 'Game Over!';
+            overlayMessageElement.textContent = `You scored ${score} points! Press RESTART to play again.`;
+            startButton.textContent = 'Restart Game';
+            
+            overlayElement.style.opacity = '1';
+            overlayElement.style.pointerEvents = 'all';
+
+            // Apply a subtle 'shake' animation to the board on Game Over (Framer Motion style)
+            popmotion.styler(boardElement).set('transform', 'translateX(0px)');
+            popmotion.timeline([
+                { track: 'x', from: 0, to: 10, duration: 50, ease: popmotion.easing.easeOut },
+                { track: 'x', from: 10, to: -10, duration: 100, ease: popmotion.easing.easeInOut },
+                { track: 'x', from: -10, to: 5, duration: 75, ease: popmotion.easing.easeInOut },
+                { track: 'x', from: 5, to: 0, duration: 50, ease: popmotion.easing.easeIn }
+            ]).start(v => {
+                 popmotion.styler(boardElement).set('transform', `translateX(${v.x || 0}px)`);
+            });
+        }
+
+        // --------------------------------------------------
+        // EVENT LISTENERS
+        // --------------------------------------------------
+
+        startButton.addEventListener('click', startGame);
+
+        document.addEventListener('keydown', (e) => {
+            if (!gameRunning) return;
+            
+            const key = e.key.toLowerCase();
+            let newDir;
+
+            switch (key) {
+                case 'arrowup':
+                case 'w': newDir = 'up'; break;
+                case 'arrowdown':
+                case 's': newDir = 'down'; break;
+                case 'arrowleft':
+                case 'a': newDir = 'left'; break;
+                case 'arrowright':
+                case 'd': newDir = 'right'; break;
+                default: return; 
+            }
+
+            // Prevent 180-degree reversal
+            const currentDir = direction;
+            const isOpposite = (
+                (currentDir === 'up' && newDir === 'down') ||
+                (currentDir === 'down' && newDir === 'up') ||
+                (currentDir === 'left' && newDir === 'right') ||
+                (currentDir === 'right' && newDir === 'left')
+            );
+
+            if (!isOpposite) {
+                nextDirection = newDir;
+            }
+        });
+
+        // --------------------------------------------------
+        // INITIALIZATION
+        // --------------------------------------------------
+        
+        // 1. Setup the physical grid structure
+        setupBoardGrid();
+        
+        // 2. Initial render state (before start)
+        initGame();
+
+    </script>
+</body>
+</html>

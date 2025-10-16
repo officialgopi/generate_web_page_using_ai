@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Snake Game | Tailwind & Framer Motion</title>
+    <meta name="description" content="A classic Snake game built using vanilla JavaScript, styled with Tailwind CSS, and animated with Framer Motion.">
+    <meta name="keywords" content="snake game, javascript, tailwind css, framer motion, html game, responsive">
+    <meta name="author" content="Senior Frontend Developer">
+
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Framer Motion & Popmotion CDN (required dependencies) -->
+    <script src="https://cdn.jsdelivr.net/npm/popmotion@11.0.5/dist/popmotion.umd.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/framer-motion@11.1.7/dist/framer-motion.min.js"></script>
+
+    <style>
+        /* Custom Tailwind Configuration via inline script */
+        /* Setting up custom colors for consistency */
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        'primary-snake': '#4ade80', /* green-400 */
+                        'food-color': '#f87171', /* red-400 */
+                        'board-bg': '#1f2937', /* gray-800 secondary */
+                    },
+                }
+            }
+        }
+
+        /* Custom Grid CSS for the Game Board */
+        /* Board size constant for 20x20 grid */
+        #game-board {
+            display: grid;
+            grid-template-columns: repeat(20, 1fr);
+            grid-template-rows: repeat(20, 1fr);
+            min-width: 300px; /* Ensure minimum readability on small screens */
+            max-width: 100%;
+        }
+
+        /* Base Cell Styling */
+        .cell {
+            width: 100%;
+            height: 100%;
+            box-sizing: border-box;
+            transition: background-color 0.05s ease-in-out, transform 0.05s ease-in-out;
+        }
+
+        /* Snake and Food States */
+        .snake {
+            background-color: var(--primary-snake);
+            border-radius: 2px;
+        }
+
+        .food {
+            background-color: var(--food-color);
+            border-radius: 50%; /* Make food round */
+            transform: scale(0.9);
+        }
+
+        /* Accessibility: Skip link for screen readers */
+        .skip-link {
+            position: absolute;
+            top: -40px;
+            left: 0;
+            background: #111827;
+            color: white;
+            padding: 8px;
+            z-index: 100;
+            transition: top 0.3s;
+        }
+        .skip-link:focus {
+            top: 0;
+        }
+    </style>
+</head>
+
+<body class="bg-gray-900 text-gray-100 min-h-screen flex flex-col items-center justify-center p-4 antialiased" tabindex="-1">
+
+    <a href="#game-container" class="skip-link rounded-br-lg focus:outline-none focus:ring-2 focus:ring-primary-snake">Skip to game content</a>
+
+    <header class="w-full max-w-lg mb-6 text-center">
+        <h1 class="text-4xl font-extrabold tracking-tight text-primary-snake uppercase mb-2">
+            SNAKE ARCADE
+        </h1>
+        <div class="flex justify-between items-center bg-gray-800 p-3 rounded-lg shadow-md">
+            <p id="score-display" class="text-xl font-mono">
+                Score: <span id="current-score" class="text-red-400 font-bold">0</span>
+            </p>
+            <p id="high-score-display" class="text-sm text-gray-400">
+                High Score: <span id="high-score">0</span>
+            </p>
+        </div>
+    </header>
+
+    <main id="game-container" class="w-full max-w-lg mx-auto bg-gray-800 rounded-xl shadow-2xl relative border border-gray-700/50" role="application" aria-label="Snake Game Board">
+        
+        <!-- Game Board -->
+        <div id="game-board" class="aspect-square bg-board-bg mx-auto border-4 border-gray-700 rounded-lg p-0.5" tabindex="0" aria-keyshortcuts="ArrowUp ArrowDown ArrowLeft ArrowRight"> 
+            <!-- Cells are dynamically injected here by JavaScript -->
+        </div>
+
+        <!-- Game State Overlay (Start/Game Over Screen) -->
+        <div id="overlay" class="absolute inset-0 bg-gray-900/90 flex flex-col items-center justify-center z-10 transition-opacity duration-300 rounded-xl">
+            <h2 id="overlay-title" class="text-5xl font-extrabold mb-4 text-primary-snake uppercase transition-transform">
+                Welcome!
+            </h2>
+            <p id="overlay-message" class="text-xl text-gray-300 mb-8 text-center px-4">
+                Use the Arrow Keys to control the snake.
+            </p>
+            <button id="start-button" class="px-8 py-3 text-xl font-semibold rounded-full bg-primary-snake text-gray-900 shadow-lg hover:shadow-xl transition-all focus:outline-none focus:ring-4 focus:ring-primary-snake/50" aria-label="Start the game">
+                Start Game
+            </button>
+        </div>
+
+    </main>
+
+    <footer class="mt-6">
+        <p class="text-xs text-gray-500">
+            Powered by Vanilla JS, Tailwind CSS, and Framer Motion (via Popmotion).
+        </p>
+    </footer>
+
+
+    <script>
+        // ------------------------------------------------------------------
+        // JavaScript Game Logic & Framer Motion Integration
+        // ------------------------------------------------------------------
+        
+        const GRID_SIZE = 20;
+        const INITIAL_SPEED = 150; // ms
+        
+        // Game State Variables
+        let snake = [];
+        let food = {};
+        let direction = { x: 1, y: 0 }; // Initial movement: right
+        let score = 0;
+        let highScore = localStorage.getItem('snakeHighScore') ? parseInt(localStorage.getItem('snakeHighScore')) : 0;
+        let gameLoopInterval;
+        let gameSpeed = INITIAL_SPEED;
+        let isPlaying = false;
+        let waitingForInput = true; // Prevent quick double inputs
+
+        // DOM Elements
+        const board = document.getElementById('game-board');
+        const overlay = document.getElementById('overlay');
+        const overlayTitle = document.getElementById('overlay-title');
+        const overlayMessage = document.getElementById('overlay-message');
+        const startButton = document.getElementById('start-button');
+        const scoreDisplay = document.getElementById('current-score');
+        const highScoreDisplay = document.getElementById('high-score');
+        const scoreContainer = document.getElementById('score-display');
+        
+        // Framer Motion (Popmotion) Utility
+        const { animate } = window.framerMotion;
+
+        // --- Initialization and Setup ---
+
+        function createBoardCells() {
+            board.innerHTML = '';
+            for (let i = 0; i < GRID_SIZE * GRID_SIZE; i++) {
+                const cell = document.createElement('div');
+                cell.classList.add('cell');
+                cell.setAttribute('data-index', i);
+                board.appendChild(cell);
+            }
+        }
+
+        function getCell(x, y) {
+            if (x >= 0 && x < GRID_SIZE && y >= 0 && y < GRID_SIZE) {
+                const index = y * GRID_SIZE + x;
+                return board.children[index];
+            }
+            return null;
+        }
+
+        function placeFood() {
+            let newFoodPos;
+            do {
+                newFoodPos = {
+                    x: Math.floor(Math.random() * GRID_SIZE),
+                    y: Math.floor(Math.random() * GRID_SIZE)
+                };
+            } while (snake.some(segment => segment.x === newFoodPos.x && segment.y === newFoodPos.y));
+            food = newFoodPos;
+        }
+
+        function resetGame() {
+            snake = [{ x: 10, y: 10 }, { x: 9, y: 10 }, { x: 8, y: 10 }];
+            direction = { x: 1, y: 0 };
+            score = 0;
+            gameSpeed = INITIAL_SPEED;
+            scoreDisplay.textContent = score;
+            highScoreDisplay.textContent = highScore;
+            placeFood();
+            draw();
+        }
+
+        // --- Game Loop and Drawing ---
+
+        function draw() {
+            // Reset all cells visually
+            Array.from(board.children).forEach(cell => {
+                cell.className = 'cell';
+            });
+
+            // Draw Snake
+            snake.forEach(segment => {
+                const cell = getCell(segment.x, segment.y);
+                if (cell) {
+                    cell.classList.add('snake');
+                }
+            });
+
+            // Draw Food
+            const foodCell = getCell(food.x, food.y);
+            if (foodCell) {
+                foodCell.classList.add('food');
+            }
+        }
+
+        function moveSnake() {
+            const head = snake[0];
+            const newHead = { x: head.x + direction.x, y: head.y + direction.y };
+
+            // 1. Check Collision (Boundary or Self)
+            if (newHead.x < 0 || newHead.x >= GRID_SIZE || 
+                newHead.y < 0 || newHead.y >= GRID_SIZE || 
+                snake.some(segment => segment.x === newHead.x && segment.y === newHead.y))
+            {
+                return gameOver();
+            }
+
+            // Add new head
+            snake.unshift(newHead);
+
+            // 2. Check Eating Food
+            if (newHead.x === food.x && newHead.y === food.y) {
+                score++;
+                scoreDisplay.textContent = score;
+                animateScoreUpdate();
+                placeFood();
+                // Speed up slightly
+                if (score % 5 === 0 && gameSpeed > 50) {
+                    gameSpeed -= 10;
+                    clearInterval(gameLoopInterval);
+                    gameLoopInterval = setInterval(gameTick, gameSpeed);
+                }
+            } else {
+                // Remove tail if no food was eaten
+                snake.pop();
+            }
+
+            draw();
+        }
+
+        function gameTick() {
+            waitingForInput = true;
+            if (isPlaying) {
+                moveSnake();
+            }
+        }
+
+        function startGame() {
+            if (isPlaying) return;
+            isPlaying = true;
+            overlay.classList.add('hidden');
+            overlay.setAttribute('aria-hidden', 'true');
+            resetGame();
+            
+            // Focus the board for immediate input
+            board.focus();
+
+            gameLoopInterval = setInterval(gameTick, gameSpeed);
+        }
+
+        function gameOver() {
+            isPlaying = false;
+            clearInterval(gameLoopInterval);
+
+            if (score > highScore) {
+                highScore = score;
+                localStorage.setItem('snakeHighScore', highScore);
+                highScoreDisplay.textContent = highScore;
+            }
+
+            overlay.classList.remove('hidden');
+            overlay.setAttribute('aria-hidden', 'false');
+            overlayTitle.textContent = "Game Over!";
+            overlayMessage.innerHTML = `You scored <span class="font-bold text-red-400">${score}</span> points. Press Restart to try again.`;
+            startButton.textContent = "Restart Game";
+            
+            // Animate game over title
+            animate(overlayTitle, { scale: [1, 1.1, 1] }, { duration: 0.5, type: 'spring' });
+        }
+
+        // --- Input Handling ---
+
+        document.addEventListener('keydown', handleKeyPress);
+        
+        function handleKeyPress(e) {
+            if (!isPlaying && e.key !== ' ' && e.key !== 'Enter') return;
+            
+            // If on start screen, Enter or Space starts the game
+            if (!isPlaying && (e.key === 'Enter' || e.key === ' ')) {
+                e.preventDefault();
+                startGame();
+                return;
+            }
+
+            if (!waitingForInput) return;
+
+            let newDir = direction;
+
+            switch (e.key) {
+                case 'ArrowUp':
+                case 'w':
+                case 'W':
+                    newDir = { x: 0, y: -1 };
+                    break;
+                case 'ArrowDown':
+                case 's':
+                case 'S':
+                    newDir = { x: 0, y: 1 };
+                    break;
+                case 'ArrowLeft':
+                case 'a':
+                case 'A':
+                    newDir = { x: -1, y: 0 };
+                    break;
+                case 'ArrowRight':
+                case 'd':
+                case 'D':
+                    newDir = { x: 1, y: 0 };
+                    break;
+                default:
+                    return; // Ignore other keys
+            }
+            
+            // Prevent movement back into the immediate segment
+            if (newDir.x * -1 !== direction.x || newDir.y * -1 !== direction.y) {
+                direction = newDir;
+                waitingForInput = false; // Wait until next tick
+            }
+        }
+
+        // --- Framer Motion / Popmotion Animations ---
+        
+        function animateScoreUpdate() {
+            // Animate the score container slightly upon eating food
+            animate(scoreContainer, 
+                { scale: [1, 1.1, 1] }, 
+                { duration: 0.3, type: 'spring' }
+            );
+        }
+
+        function setupButtonAnimations() {
+            // Apply hover animations using Popmotion's animate function
+            
+            startButton.addEventListener('mouseenter', () => {
+                animate(startButton, { scale: 1.05, boxShadow: '0 10px 15px -3px rgba(74, 222, 128, 0.5)' }, { duration: 0.2 });
+            });
+            startButton.addEventListener('mouseleave', () => {
+                animate(startButton, { scale: 1, boxShadow: '0 4px 6px -1px rgba(0,0,0,0.1)' }, { duration: 0.3 });
+            });
+            startButton.addEventListener('click', startGame);
+        }
+
+
+        // --- Initial Load ---
+        document.addEventListener('DOMContentLoaded', () => {
+            createBoardCells();
+            resetGame();
+            setupButtonAnimations();
+        });
+
+    </script>
+</body>
+</html>

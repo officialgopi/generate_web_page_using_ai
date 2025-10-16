@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+  </head>
+  <body class="bg-neutral-950">
+    <div id="main" class="p-3 w-full mx-auto flex flex-col gap-4 items-center">
+      <textarea
+        id="prompt"
+        class="w-[1200px] border p-4 rounded-lg border-neutral-500/50 text-neutral-200 placeholder:text-neutral-500/50 focus:outline-none focus:border-neutral-300/50 focus:bg-neutral-950/80 transition-all duration-200"
+        placeholder="Enter your prompt here"
+      ></textarea>
+      <button
+        class="p-2 text-neutral-200 border rounded-lg hover:bg-neutral-900 transition-colors"
+        id="gen-btn"
+      >
+        Generate
+      </button>
+    </div>
+
+    <script>
+      const btn = document.getElementById("gen-btn");
+      const div = document.getElementById("main");
+
+      btn.addEventListener("click", async () => {
+        try {
+          btn.disabled = true;
+          btn.textContent = "Generating...";
+          btn.classList.add("animate-pulse");
+          const promptInput = document.getElementById("prompt");
+          const res = await fetch("/", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ prompt: promptInput.value }),
+          });
+
+          const body = await res.json();
+
+          if (!body.page) {
+            alert("Error generating page. Please try again.");
+            return;
+          }
+
+          const pagesList = document.getElementById("pages-list");
+          if (pagesList) {
+            const link = document.createElement("a");
+            link.href = `/page/${body.page}`;
+            link.textContent = `Go to Page - ${body.page}`;
+
+            link.className =
+              "p-2 text-neutral-200 border rounded-lg hover:bg-neutral-900 transition-colors";
+            pagesList.appendChild(link);
+          }
+        } catch (err) {
+          console.error("Error:", err);
+        } finally {
+          btn.disabled = false;
+          btn.textContent = "Generate";
+          btn.classList.remove("animate-pulse");
+        }
+      });
+
+      window.addEventListener("DOMContentLoaded", async () => {
+        try {
+          const { pages } = await (await fetch("/api/pages")).json();
+
+          const hr1 = document.createElement("hr");
+
+          const heading = document.createElement("h2");
+          heading.textContent = "Previously Generated Pages";
+          heading.className = "text-neutral-200 text-2xl font-bold";
+
+          const hr2 = document.createElement("hr");
+
+          const pagesList = document.createElement("div");
+          pagesList.id = "pages-list";
+          pagesList.className =
+            "flex flex-col gap-2 items-center text-neutral-200";
+
+          div.append(hr1, heading, hr2, pagesList);
+          pages?.forEach((page) => {
+            const link = document.createElement("a");
+            link.href = `/page/${page}`;
+            link.textContent = `Go to Page - ${page}`;
+            link.className =
+              "p-2 text-neutral-200 border rounded-lg hover:bg-neutral-900 transition-colors";
+            pagesList.appendChild(link);
+          });
+        } catch (err) {
+          console.error("Error loading pages:", err);
+        }
+      });
+    </script>
+  </body>
+</html>

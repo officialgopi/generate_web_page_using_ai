@@ -1,0 +1,468 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CodeDiffly | Visual Code Comparison Tool</title>
+    
+    <!-- SEO & Accessibility Best Practices -->
+    <meta name="description" content="CodeDiffly: Instantly compare two code snippets visually and highlight differences line-by-line and word-by-word with a modern, dark UI.">
+    <meta name="keywords" content="code comparison, diff tool, visual diff, code snippets, frontend development, framer motion, tailwind css">
+    <link rel="canonical" href="#">
+    <meta name="author" content="CodeDiffly">
+    
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Framer Motion for the Web CDN (Lightweight version for CDN usage) -->
+    <!-- Note: We use a specific version for reliability -->
+    <script src="https://cdn.jsdelivr.net/npm/framer-motion@11.2.10/dist/framer-motion.min.js"></script>
+    
+    <style>
+        /* Performance & Aesthetic CSS Enhancements */
+
+        /* Custom scrollbar for aesthetic in dark mode */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #1f2937; /* Gray-800 */
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #4b5563; /* Gray-600 */
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #6b7280; /* Gray-500 */
+        }
+
+        /* Styling for the code comparison containers */
+        .code-input-container {
+            font-family: 'Consolas', 'Monospace', monospace;
+            font-size: 14px;
+            tab-size: 4;
+            line-height: 1.5;
+            min-height: 300px;
+            overflow-y: auto;
+            /* Prevent vertical scrollbar from shifting content width */
+            scrollbar-width: thin; 
+        }
+        
+        /* Styling for the Diff Output */
+        .code-line {
+            padding: 2px 0;
+            display: flex;
+            align-items: flex-start;
+        }
+        .line-number {
+            flex-shrink: 0;
+            width: 30px;
+            text-align: right;
+            margin-right: 10px;
+            color: #4b5563; /* Gray-600 */
+            user-select: none;
+            cursor: default;
+            padding-top: 1px;
+        }
+        .line-content {
+            flex-grow: 1;
+            white-space: pre-wrap; 
+            word-wrap: break-word; /* Ensure wrapping on smaller screens */
+            min-height: 1.5em; /* Ensure lines maintain height even if empty */
+        }
+
+        /* Diff highlighting styles */
+        .diff-added { 
+            /* Light green background for lines added/changed in B */
+            background-color: rgba(52, 211, 163, 0.15); 
+        }
+        .diff-removed { 
+            /* Light red background for lines removed/changed in A */
+            background-color: rgba(239, 68, 68, 0.15); 
+        }
+        .diff-changed-word {
+            padding: 1px 3px;
+            border-radius: 3px;
+            font-weight: 600;
+        }
+        .diff-added-word {
+            background-color: #064e3b; /* Emerald-900 */
+            color: #6ee7b7; /* Emerald-300 */
+        }
+        .diff-removed-word {
+            background-color: #7f1d1d; /* Red-900 */
+            color: #fca5a5; /* Red-300 */
+        }
+    </style>
+</head>
+<body class="bg-gray-900 text-gray-100 antialiased leading-relaxed">
+
+    <!-- Header/Navigation -->
+    <header class="sticky top-0 z-50 bg-gray-900/90 backdrop-blur-sm shadow-xl border-b border-gray-800" aria-label="Site Navigation">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex justify-between items-center">
+            <a href="#hero" class="text-2xl font-extrabold text-teal-400 tracking-tight transition hover:text-teal-300">
+                CodeDiffly
+            </a>
+            <nav class="space-x-6 hidden sm:block" role="navigation">
+                <a href="#demo" class="text-gray-300 hover:text-teal-400 transition duration-300 ease-in-out font-medium">Demo</a>
+                <a href="#features" class="text-gray-300 hover:text-teal-400 transition duration-300 ease-in-out font-medium">Features</a>
+            </nav>
+        </div>
+    </header>
+
+    <main>
+        <!-- Hero Section -->
+        <section id="hero" class="py-20 md:py-32 text-center overflow-hidden">
+            <div class="max-w-4xl mx-auto px-4">
+                
+                <p data-framer-motion='{"initial": {"opacity": 0, "y": -20}, "animate": {"opacity": 1, "y": 0}, "transition": {"duration": 0.5, "delay": 0.1}}'
+                   class="text-teal-400 uppercase tracking-widest font-semibold mb-3">
+                    Visualize Code Differences
+                </p>
+                
+                <h2 data-framer-motion='{"initial": {"opacity": 0, "scale": 0.9}, "animate": {"opacity": 1, "scale": 1}, "transition": {"type": "spring", "stiffness": 80, "delay": 0.3}}'
+                    class="text-5xl sm:text-7xl font-extrabold leading-tight mb-6 bg-clip-text text-transparent bg-gradient-to-r from-teal-400 to-sky-500">
+                    Instantly Spot the Change.
+                </h2>
+                
+                <p data-framer-motion='{"initial": {"opacity": 0, "y": 20}, "animate": {"opacity": 1, "y": 0}, "transition": {"duration": 0.6, "delay": 0.5}}'
+                   class="text-xl text-gray-400 mb-10 max-w-2xl mx-auto">
+                    CodeDiffly provides a clean, side-by-side visual comparison for your code snippets, making review easy and fast.
+                </p>
+                
+                <a href="#demo" 
+                   data-framer-motion='{"initial": {"opacity": 0, "y": 30}, "animate": {"opacity": 1, "y": 0}, "transition": {"duration": 0.7, "delay": 0.7}}'
+                   class="inline-flex items-center justify-center px-8 py-3 border border-transparent text-base font-medium rounded-full text-gray-900 bg-teal-400 hover:bg-teal-300 transition duration-300 ease-in-out shadow-lg transform hover:scale-105 focus:outline-none focus:ring-4 focus:ring-offset-2 focus:ring-teal-400 focus:ring-offset-gray-900" aria-label="Go to Live Demo">
+                    Try the Live Demo
+                    <svg xmlns="http://www.w3.org/2000/svg" class="ml-2 h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                        <path fill-rule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clip-rule="evenodd" />
+                    </svg>
+                </a>
+            </div>
+        </section>
+
+        <!-- Features Section -->
+        <section id="features" class="py-16 bg-gray-900 border-t border-gray-800">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <h3 class="text-3xl font-bold text-center mb-12 text-gray-50">Key Features</h3>
+                
+                <div class="grid md:grid-cols-3 gap-8">
+                    
+                    <!-- Feature 1 -->
+                    <article data-framer-motion='{"initial": {"opacity": 0, "x": -50}, "animate": {"opacity": 1, "x": 0}, "transition": {"duration": 0.6, "delay": 0.2}}'
+                             class="p-6 bg-gray-800 rounded-xl shadow-xl border border-gray-700 hover:border-teal-500 transition duration-300 group hover:shadow-teal-900/50">
+                        <div class="flex items-center mb-4">
+                            <div class="p-3 rounded-full bg-teal-500/20 text-teal-400" aria-hidden="true">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" />
+                                </svg>
+                            </div>
+                            <h4 class="ml-4 text-xl font-semibold text-gray-50 group-hover:text-teal-400">Line & Word Level Diff</h4>
+                        </div>
+                        <p class="text-gray-400">See changes highlighted down to the individual word, minimizing confusion and missed details in your reviews.</p>
+                    </article>
+
+                    <!-- Feature 2 -->
+                    <article data-framer-motion='{"initial": {"opacity": 0, "y": 50}, "animate": {"opacity": 1, "y": 0}, "transition": {"duration": 0.6, "delay": 0.4}}'
+                             class="p-6 bg-gray-800 rounded-xl shadow-xl border border-gray-700 hover:border-sky-500 transition duration-300 group hover:shadow-sky-900/50">
+                        <div class="flex items-center mb-4">
+                            <div class="p-3 rounded-full bg-sky-500/20 text-sky-400" aria-hidden="true">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9.25 10.5M16.25 17L16.75 10.5M3 6h18M5 10h14a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2v-8a2 2 0 012-2z" />
+                                </svg>
+                            </div>
+                            <h4 class="ml-4 text-xl font-semibold text-gray-50 group-hover:text-sky-400">Modern Dark UI</h4>
+                        </div>
+                        <p class="text-gray-400">A high-contrast, dark theme built with TailwindCSS for maximum readability and reduced eye strain.</p>
+                    </article>
+
+                    <!-- Feature 3 -->
+                    <article data-framer-motion='{"initial": {"opacity": 0, "x": 50}, "animate": {"opacity": 1, "x": 0}, "transition": {"duration": 0.6, "delay": 0.6}}'
+                             class="p-6 bg-gray-800 rounded-xl shadow-xl border border-gray-700 hover:border-emerald-500 transition duration-300 group hover:shadow-emerald-900/50">
+                        <div class="flex items-center mb-4">
+                            <div class="p-3 rounded-full bg-emerald-500/20 text-emerald-400" aria-hidden="true">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
+                                </svg>
+                            </div>
+                            <h4 class="ml-4 text-xl font-semibold text-gray-50 group-hover:text-emerald-400">Instant & Responsive</h4>
+                        </div>
+                        <p class="text-gray-400">Built for speed using pure front-end technologies. Works perfectly on all devices, large or small.</p>
+                    </article>
+                </div>
+            </div>
+        </section>
+        
+        <!-- Interactive Demo Section -->
+        <section id="demo" class="py-16 md:py-24 bg-gray-900 border-t border-gray-800">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                
+                <h3 class="text-4xl font-extrabold text-center mb-10 text-gray-50">Interactive Diff Demo</h3>
+                
+                <div data-framer-motion='{"initial": {"opacity": 0, "y": 40}, "animate": {"opacity": 1, "y": 0}, "transition": {"duration": 0.8, "delay": 0.1}}'
+                     class="bg-gray-800 p-6 rounded-xl shadow-2xl border border-gray-700">
+                    
+                    <!-- Input Area -->
+                    <div class="grid lg:grid-cols-2 gap-6 mb-6">
+                        <div>
+                            <label for="codeA" class="block mb-2 text-lg font-medium text-teal-400">Original Code (A)</label>
+                            <textarea id="codeA" rows="10" placeholder="// Paste your original code here" onscroll="syncInputScroll(event)"
+                                class="w-full bg-gray-900 text-gray-200 border border-gray-700 p-4 rounded-lg focus:ring-teal-500 focus:border-teal-500 code-input-container resize-none outline-none transition duration-200"></textarea>
+                        </div>
+                        <div>
+                            <label for="codeB" class="block mb-2 text-lg font-medium text-sky-400">Modified Code (B)</label>
+                            <textarea id="codeB" rows="10" placeholder="// Paste your modified code here" onscroll="syncInputScroll(event)"
+                                class="w-full bg-gray-900 text-gray-200 border border-gray-700 p-4 rounded-lg focus:ring-sky-500 focus:border-sky-500 code-input-container resize-none outline-none transition duration-200"></textarea>
+                        </div>
+                    </div>
+                    
+                    <!-- Action Button -->
+                    <div class="text-center mb-10">
+                        <button id="diffButton" aria-label="Compare Code Snippets" type="button"
+                            class="px-10 py-3 bg-teal-600 text-white font-bold rounded-full text-lg shadow-md hover:bg-teal-500 transition duration-300 transform hover:scale-105 focus:outline-none focus:ring-4 focus:ring-teal-500 focus:ring-opacity-50">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 inline mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4" />
+                            </svg>
+                            Compare Diff
+                        </button>
+                    </div>
+
+                    <!-- Output Display Area -->
+                    <h4 class="text-2xl font-semibold mb-4 text-gray-50">Comparison Results:</h4>
+                    <div class="grid lg:grid-cols-2 gap-6">
+                        
+                        <!-- Output A (Removed/Original) -->
+                        <div class="bg-gray-900 p-4 rounded-lg border border-gray-700 overflow-hidden shadow-inner">
+                             <h5 class="text-sm text-gray-400 mb-2">Code A (Reference)</h5>
+                            <div id="outputA" class="code-input-container overflow-x-auto" role="log" aria-live="polite" tabindex="0">
+                                <!-- Diff output for A will be rendered here -->
+                            </div>
+                        </div>
+                        
+                        <!-- Output B (Added/Modified) -->
+                        <div class="bg-gray-900 p-4 rounded-lg border border-gray-700 overflow-hidden shadow-inner">
+                            <h5 class="text-sm text-gray-400 mb-2">Code B (New Version)</h5>
+                            <div id="outputB" class="code-input-container overflow-x-auto" role="log" aria-live="polite" tabindex="0">
+                                <!-- Diff output for B will be rendered here -->
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Legend -->
+                    <div class="mt-8 flex flex-wrap justify-center gap-6 text-sm text-gray-300">
+                        <span class="flex items-center">
+                            <span class="w-3 h-3 rounded mr-2 diff-added-word border border-emerald-500"></span> Added Word
+                        </span>
+                        <span class="flex items-center">
+                            <span class="w-3 h-3 rounded mr-2 diff-removed-word border border-red-500"></span> Removed Word
+                        </span>
+                        <span class="flex items-center">
+                            <span class="w-4 h-4 mr-2 diff-added border border-emerald-600"></span> Added/Changed Line (B)
+                        </span>
+                        <span class="flex items-center">
+                            <span class="w-4 h-4 mr-2 diff-removed border border-red-600"></span> Removed/Changed Line (A)
+                        </span>
+                    </div>
+                    
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-gray-800 border-t border-gray-700 mt-10 py-8">
+        <div class="max-w-7xl mx-auto px-4 text-center text-gray-400">
+            <p>&copy; 2024 CodeDiffly. All rights reserved. Built with <a href="https://tailwindcss.com/" target="_blank" rel="noopener noreferrer" class="text-teal-400 hover:text-teal-300 transition">TailwindCSS</a> and <a href="https://www.framer.com/motion/" target="_blank" rel="noopener noreferrer" class="text-teal-400 hover:text-teal-300 transition">Framer Motion</a>.</p>
+            <p class="mt-2 text-xs text-gray-500">Note: The interactive demo uses simplified word-level front-end diffing logic for illustration purposes.</p>
+        </div>
+    </footer>
+
+    <script>
+        /**
+         * Pure JavaScript Diffing Logic (Simplified Word-Level Comparison)
+         */
+
+        // Helper function to tokenize strings while preserving delimiters (spaces, punctuation)
+        function tokenize(text) {
+            // Matches words (\w+), sequences of non-word chars excluding spaces (\S+), or spaces (\s+)
+            const tokens = text.match(/(\w+|[\s]+|[^\s\w])/g) || [];
+            // Filter out any potential null or empty matches if the input was complex, though regex handles most cases.
+            return tokens.filter(t => t.length > 0);
+        }
+
+        // Compares two token arrays and wraps unique tokens with highlighting spans
+        function highlightWordDiff(tokens1, tokens2) {
+            // Create sets for fast lookup
+            const set1 = new Set(tokens1.map(t => t.trim().toLowerCase()).filter(t => t));
+            const set2 = new Set(tokens2.map(t => t.trim().toLowerCase()).filter(t => t));
+
+            // Helper function to map tokens to highlighted HTML
+            const mapTokens = (sourceTokens, comparisonSet, highlightClass) => {
+                return sourceTokens.map(token => {
+                    const trimmedToken = token.trim().toLowerCase();
+                    // Check if the token is unique to the source (i.e., not present in the comparison set)
+                    if (trimmedToken && !comparisonSet.has(trimmedToken)) {
+                        // Ensure we don't highlight purely whitespace tokens
+                        if (token.trim() !== '') {
+                            return `<span class="diff-changed-word ${highlightClass}">${token}</span>`;
+                        }
+                    }
+                    return token; // Return token as is (including whitespace)
+                }).join('');
+            };
+
+            // Output 1: Highlight words in A that are missing in B (Removed)
+            const output1 = mapTokens(tokens1, set2, 'diff-removed-word');
+
+            // Output 2: Highlight words in B that are missing in A (Added)
+            const output2 = mapTokens(tokens2, set1, 'diff-added-word');
+
+            return { output1, output2 };
+        }
+
+        // Main Diff Function
+        function performDiff() {
+            const codeA = document.getElementById('codeA').value;
+            const codeB = document.getElementById('codeB').value;
+            const outputA = document.getElementById('outputA');
+            const outputB = document.getElementById('outputB');
+
+            const linesA = codeA.split('\n');
+            const linesB = codeB.split('\n');
+            const maxLines = Math.max(linesA.length, linesB.length);
+
+            let htmlA = '';
+            let htmlB = '';
+
+            // Iterate through all possible lines
+            for (let i = 0; i < maxLines; i++) {
+                const lineA = linesA[i] !== undefined ? linesA[i] : '';
+                const lineB = linesB[i] !== undefined ? linesB[i] : '';
+                
+                const lineNumber = i + 1;
+                
+                let contentA = lineA;
+                let contentB = lineB;
+                let lineClassA = '';
+                let lineClassB = '';
+
+                const areLinesDifferent = lineA.trim() !== lineB.trim();
+
+                if (areLinesDifferent) {
+                    const tokensA = tokenize(lineA);
+                    const tokensB = tokenize(lineB);
+                    
+                    const { output1, output2 } = highlightWordDiff(tokensA, tokensB);
+
+                    contentA = output1 || '&nbsp;';
+                    contentB = output2 || '&nbsp;';
+
+                    
+                    // Determine line change classification
+                    
+                    const lineAExists = linesA.length > i; // True if line A exists
+                    const lineBExists = linesB.length > i; // True if line B exists
+
+                    if (lineAExists && !lineBExists) {
+                        // Line existed in A but not in B (Deletion/Removal)
+                        lineClassA = 'diff-removed';
+                    } else if (!lineAExists && lineBExists) {
+                        // Line exists in B but not in A (Insertion/Addition)
+                        lineClassB = 'diff-added';
+                    } else if (lineAExists && lineBExists) {
+                        // Line exists in both but content differs (Modification)
+                        lineClassA = 'diff-removed'; // Highlight A as 'old' content
+                        lineClassB = 'diff-added';   // Highlight B as 'new' content
+                    }
+                    
+                }
+                
+                // Construct HTML output, using &nbsp; for visual height on empty lines
+                htmlA += `
+                    <div class="code-line ${lineClassA}">
+                        <span class="line-number">${lineNumber}</span>
+                        <span class="line-content">${contentA || '&nbsp;'}</span>
+                    </div>`;
+                
+                htmlB += `
+                    <div class="code-line ${lineClassB}">
+                        <span class="line-number">${lineNumber}</span>
+                        <span class="line-content">${contentB || '&nbsp;'}</span>
+                    </div>`;
+            }
+
+            outputA.innerHTML = htmlA;
+            outputB.innerHTML = htmlB;
+
+            // Ensure scroll synchronization after content update
+            outputA.scrollTop = 0;
+            outputB.scrollTop = 0;
+        }
+
+        // Function to synchronize scrolling between the two output panes
+        function syncScroll(event) {
+            const outputA = document.getElementById('outputA');
+            const outputB = document.getElementById('outputB');
+            
+            if (event.target === outputA) {
+                outputB.scrollTop = outputA.scrollTop;
+            } else if (event.target === outputB) {
+                outputA.scrollTop = outputB.scrollTop;
+            }
+        }
+
+        // Function to synchronize scrolling between the two input panes
+        function syncInputScroll(event) {
+            const codeA = document.getElementById('codeA');
+            const codeB = document.getElementById('codeB');
+            
+            if (event.target === codeA) {
+                codeB.scrollTop = codeA.scrollTop;
+            } else if (event.target === codeB) {
+                codeA.scrollTop = codeB.scrollTop;
+            }
+        }
+
+        // Initialization and Event Listeners
+        document.addEventListener('DOMContentLoaded', () => {
+            // Set initial example code for demonstration
+            document.getElementById('codeA').value = `function calculateTotal(items) {
+  let total = 0;
+  // Iterate and sum up prices
+  for (const item of items) {
+    total += item.price;
+  }
+  return total;
+}
+
+// Example call:
+const products = [{price: 10}, {price: 5}];
+console.log(calculateTotal(products));
+`;
+            document.getElementById('codeB').value = `function calculateSum(items) {
+  let sum = 0; // Renamed variable
+  // Iterate and aggregate costs
+  for (const item of items) {
+    sum += item.cost * item.quantity;
+  }
+  return sum;
+}
+
+// Example usage:
+const products = [{cost: 10, quantity: 2}, {cost: 5, quantity: 1}];
+console.log(calculateSum(products));
+`;
+
+            // Run diff on load to populate the demo
+            performDiff();
+            
+            document.getElementById('diffButton').addEventListener('click', performDiff);
+
+            // Sync scroll listeners for output
+            document.getElementById('outputA').addEventListener('scroll', syncScroll);
+            document.getElementById('outputB').addEventListener('scroll', syncScroll);
+        });
+    </script>
+</body>
+</html>

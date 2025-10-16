@@ -1,0 +1,521 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Synapse AI | Next-Generation Content Automation</title>
+    <meta name="description" content="Generate high-quality, unique content in seconds using Synapse AI. Perfect for blogs, marketing, and scaling content production.">
+    <meta name="keywords" content="AI content generation, SaaS, content marketing, copywriting tool, artificial intelligence">
+    
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- GSAP (Simulating Framer Motion capabilities in vanilla environment) -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+
+    <!-- Custom Tailwind Configuration (Optional: for custom colors/fonts) -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'primary-indigo': '#4f46e5',
+                        'dark-slate': '#0f172a',
+                        'light-slate': '#f1f5f9',
+                    },
+                }
+            }
+        }
+    </script>
+
+    <!-- Inline CSS for performance/utility (optional for small fixes) -->
+    <style>
+        /* Custom scrollbar for better aesthetics */
+        body::-webkit-scrollbar {
+            width: 8px;
+        }
+        body::-webkit-scrollbar-thumb {
+            background-color: #6366f1; /* Indigo-500 */
+            border-radius: 4px;
+        }
+        body {
+            font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+        }
+    </style>
+</head>
+<body class="bg-dark-slate text-light-slate antialiased overflow-x-hidden">
+
+    <!-- HEADER/NAVIGATION -->
+    <header class="sticky top-0 z-50 bg-dark-slate/95 backdrop-blur-md shadow-lg border-b border-indigo-900/50">
+        <nav class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex justify-between items-center" aria-label="Main Navigation">
+            
+            <!-- Logo -->
+            <a href="#hero" class="text-2xl font-bold text-primary-indigo tracking-wider focus:outline-none focus:ring-2 focus:ring-indigo-400 rounded p-1" aria-label="Synapse AI Home">
+                Synapse AI
+            </a>
+
+            <!-- Desktop Links -->
+            <div class="hidden md:flex space-x-8 items-center">
+                <a href="#features" class="text-sm font-medium hover:text-indigo-400 transition duration-300 px-2 py-1">Features</a>
+                <a href="#pricing" class="text-sm font-medium hover:text-indigo-400 transition duration-300 px-2 py-1">Pricing</a>
+                <a href="#testimonials" class="text-sm font-medium hover:text-indigo-400 transition duration-300 px-2 py-1">Testimonials</a>
+                <a href="#contact" class="text-sm font-medium hover:text-indigo-400 transition duration-300 px-2 py-1">Contact</a>
+                
+                <a href="#signup" class="inline-flex items-center justify-center px-4 py-2 border border-transparent text-sm font-medium rounded-lg shadow-sm text-white bg-primary-indigo hover:bg-indigo-600 transition duration-300 transform hover:scale-[1.02] ml-4">
+                    Start Free Trial
+                </a>
+            </div>
+
+            <!-- Mobile Menu Button -->
+            <button id="menu-button" class="md:hidden text-light-slate p-2 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-400" aria-expanded="false" aria-controls="mobile-menu" aria-label="Open menu">
+                <!-- Heroicon menu -->
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>
+            </button>
+        </nav>
+
+        <!-- Mobile Menu (Hidden by default) -->
+        <div id="mobile-menu" class="hidden md:hidden absolute top-full left-0 right-0 bg-dark-slate border-t border-indigo-900 shadow-xl">
+            <div class="px-2 pt-2 pb-3 space-y-1 sm:px-3 flex flex-col">
+                <a href="#features" class="block px-3 py-2 text-base font-medium text-light-slate hover:bg-indigo-800 rounded-md">Features</a>
+                <a href="#pricing" class="block px-3 py-2 text-base font-medium text-light-slate hover:bg-indigo-800 rounded-md">Pricing</a>
+                <a href="#testimonials" class="block px-3 py-2 text-base font-medium text-light-slate hover:bg-indigo-800 rounded-md">Testimonials</a>
+                <a href="#contact" class="block px-3 py-2 text-base font-medium text-light-slate hover:bg-indigo-800 rounded-md">Contact</a>
+                <a href="#signup" class="mt-2 block w-full text-center px-4 py-2 border border-transparent text-base font-medium rounded-lg text-white bg-primary-indigo hover:bg-indigo-600">Start Free Trial</a>
+            </div>
+        </div>
+    </header>
+
+    <main>
+
+        <!-- HERO SECTION -->
+        <section id="hero" class="relative pt-16 pb-24 lg:pt-32 lg:pb-40 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+            <div class="flex flex-col items-center">
+                
+                <p class="hero-badge inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold text-indigo-300 bg-indigo-900 border border-indigo-700/50 mb-4 tracking-wide uppercase">
+                    🚀 The Future of Content is Here
+                </p>
+
+                <h1 class="hero-title text-4xl sm:text-5xl lg:text-7xl font-extrabold text-white leading-tight mb-6 lg:max-w-4xl">
+                    AI Content Generation, <span class="text-primary-indigo block lg:inline">Redefined.</span>
+                </h1>
+
+                <p class="hero-subtitle mt-4 text-lg sm:text-xl text-gray-400 lg:max-w-3xl mb-10">
+                    Generate high-quality blogs, marketing copy, and scripts in seconds. Synapse AI helps you scale your content strategy without sacrificing quality.
+                </p>
+
+                <div class="hero-cta flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4">
+                    <a href="#signup" class="inline-flex items-center justify-center px-8 py-3 border border-transparent text-base font-medium rounded-xl shadow-lg text-white bg-primary-indigo hover:bg-indigo-600 transition duration-300 transform hover:scale-105">
+                        Get Started Free
+                    </a>
+                    <a href="#features" class="inline-flex items-center justify-center px-8 py-3 text-base font-medium rounded-xl text-indigo-300 border border-indigo-700 hover:bg-indigo-900 transition duration-300">
+                        View Features
+                    </a>
+                </div>
+            </div>
+
+            <!-- Placeholder Mockup Image (Animated) -->
+            <div class="hero-image mt-20 relative w-full lg:max-w-5xl mx-auto">
+                <div class="aspect-[16/9] bg-indigo-950 rounded-2xl border border-indigo-700/50 shadow-[0_25px_50px_-12px_rgba(0,0,0,0.5)] flex items-center justify-center p-8">
+                    <p class="text-lg text-indigo-400">[AI Content Generation Dashboard Mockup Placeholder]</p>
+                </div>
+                <!-- Subtle background glow for aesthetics -->
+                <div class="absolute inset-0 top-1/2 -z-10 bg-primary-indigo opacity-10 blur-3xl rounded-full"></div>
+            </div>
+        </section>
+
+        <!-- FEATURES SECTION -->
+        <section id="features" class="py-20 lg:py-32 bg-slate-900 border-t border-b border-indigo-900/50" aria-labelledby="features-heading">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="text-center mb-16">
+                    <h2 id="features-heading" class="text-3xl sm:text-4xl font-bold text-white mb-4 feature-heading">
+                        Generate 10x Faster
+                    </h2>
+                    <p class="text-lg text-gray-400 lg:max-w-3xl mx-auto feature-subheading">
+                        Stop wasting time writing manually. Synapse AI handles the heavy lifting, giving you instant, polished results.
+                    </p>
+                </div>
+
+                <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-10">
+                    
+                    <!-- Feature 1 -->
+                    <div class="feature-item p-6 bg-dark-slate rounded-xl shadow-2xl border border-indigo-900/50 transition duration-300 hover:border-primary-indigo/70">
+                        <div class="flex items-center justify-center w-12 h-12 rounded-full bg-primary-indigo/20 text-primary-indigo mb-4">
+                            <!-- Icon: Speed -->
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
+                        </div>
+                        <h3 class="text-xl font-semibold text-white mb-3">Lightning Speed</h3>
+                        <p class="text-gray-400">Generate full articles or hundreds of product descriptions in less than 60 seconds.</p>
+                    </div>
+
+                    <!-- Feature 2 -->
+                    <div class="feature-item p-6 bg-dark-slate rounded-xl shadow-2xl border border-indigo-900/50 transition duration-300 hover:border-primary-indigo/70">
+                        <div class="flex items-center justify-center w-12 h-12 rounded-full bg-primary-indigo/20 text-primary-indigo mb-4">
+                            <!-- Icon: Quality -->
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 3v4M3 5h4M6 17v4M17 17h4M17 17l-1.89-1.89m-3.88 3.88l-1.89-1.89m-1.89 1.89l1.89-1.89M17 6h-2.94a2 2 0 00-1.664.887l-2.736 3.648a2 2 0 00-.036 2.45l2.736 3.648A2 2 0 0014.06 18H17"></path></svg>
+                        </div>
+                        <h3 class="text-xl font-semibold text-white mb-3">Human-like Quality</h3>
+                        <p class="text-gray-400">Our proprietary model generates contextually accurate and engaging content that passes scrutiny.</p>
+                    </div>
+
+                    <!-- Feature 3 -->
+                    <div class="feature-item p-6 bg-dark-slate rounded-xl shadow-2xl border border-indigo-900/50 transition duration-300 hover:border-primary-indigo/70">
+                        <div class="flex items-center justify-center w-12 h-12 rounded-full bg-primary-indigo/20 text-primary-indigo mb-4">
+                            <!-- Icon: SEO -->
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19V6l12-3v14m-6 3H9m12-3v4M3 6l9-3 9 3-9 3-9-3z"></path></svg>
+                        </div>
+                        <h3 class="text-xl font-semibold text-white mb-3">SEO Optimized</h3>
+                        <p class="text-gray-400">Built-in tools ensure your generated content is automatically optimized for search engine rankings.</p>
+                    </div>
+
+                    <!-- Feature 4 -->
+                    <div class="feature-item p-6 bg-dark-slate rounded-xl shadow-2xl border border-indigo-900/50 transition duration-300 hover:border-primary-indigo/70">
+                        <div class="flex items-center justify-center w-12 h-12 rounded-full bg-primary-indigo/20 text-primary-indigo mb-4">
+                            <!-- Icon: Templates -->
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h-5v-1a4 4 0 014-4h4.5M15 12a4 4 0 11-8 0 4 4 0 018 0zM12 21v-4m0 0a4 4 0 110-8 4 4 0 010 8z"></path></svg>
+                        </div>
+                        <h3 class="text-xl font-semibold text-white mb-3">100+ Templates</h3>
+                        <p class="text-gray-400">Access a vast library of templates for every need: ads, emails, landing pages, and more.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- TESTIMONIALS SECTION -->
+        <section id="testimonials" class="py-20 lg:py-32" aria-labelledby="testimonials-heading">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="text-center mb-16">
+                    <h2 id="testimonials-heading" class="text-3xl sm:text-4xl font-bold text-white mb-4 testimonial-heading">
+                        Trusted by Content Teams Worldwide
+                    </h2>
+                    <p class="text-lg text-gray-400 lg:max-w-3xl mx-auto testimonial-subheading">
+                        Hear how Synapse AI transformed content creation for our satisfied clients.
+                    </p>
+                </div>
+
+                <div class="grid md:grid-cols-3 gap-8">
+
+                    <!-- Testimonial 1 -->
+                    <figure class="testimonial-card p-8 bg-slate-900 rounded-xl shadow-xl border border-indigo-900/50 hover:shadow-indigo-500/10 transition duration-300">
+                        <blockquote class="text-lg italic text-gray-300">
+                            “Synapse AI cut our content production time by 80%. The quality is consistently excellent, making it our most valuable marketing tool.”
+                        </blockquote>
+                        <figcaption class="mt-6 flex items-center">
+                            <div class="w-10 h-10 bg-indigo-700 rounded-full flex items-center justify-center text-white font-bold text-lg mr-4" aria-hidden="true">A</div>
+                            <div>
+                                <cite class="font-semibold text-white not-italic">Alex R.</cite>
+                                <p class="text-sm text-indigo-400">CMO at TechSolutions Inc.</p>
+                            </div>
+                        </figcaption>
+                    </figure>
+
+                    <!-- Testimonial 2 -->
+                    <figure class="testimonial-card p-8 bg-slate-900 rounded-xl shadow-xl border border-indigo-900/50 hover:shadow-indigo-500/10 transition duration-300">
+                        <blockquote class="text-lg italic text-gray-300">
+                            “We were struggling to scale blog content. Now, we produce weekly high-volume content without hiring more writers. Highly recommended.”
+                        </blockquote>
+                        <figcaption class="mt-6 flex items-center">
+                            <div class="w-10 h-10 bg-indigo-700 rounded-full flex items-center justify-center text-white font-bold text-lg mr-4" aria-hidden="true">M</div>
+                            <div>
+                                <cite class="font-semibold text-white not-italic">Maria L.</cite>
+                                <p class="text-sm text-indigo-400">Head of Growth at EcomPulse</p>
+                            </div>
+                        </figcaption>
+                    </figure>
+
+                    <!-- Testimonial 3 -->
+                    <figure class="testimonial-card p-8 bg-slate-900 rounded-xl shadow-xl border border-indigo-900/50 hover:shadow-indigo-500/10 transition duration-300">
+                        <blockquote class="text-lg italic text-gray-300">
+                            “The ability to fine-tune the AI voice is incredible. It seamlessly matches our brand tone every single time.”
+                        </blockquote>
+                        <figcaption class="mt-6 flex items-center">
+                            <div class="w-10 h-10 bg-indigo-700 rounded-full flex items-center justify-center text-white font-bold text-lg mr-4" aria-hidden="true">J</div>
+                            <div>
+                                <cite class="font-semibold text-white not-italic">Jordan P.</cite>
+                                <p class="text-sm text-indigo-400">Content Strategist, Freelance</p>
+                            </div>
+                        </figcaption>
+                    </figure>
+                </div>
+            </div>
+        </section>
+
+        <!-- PRICING SECTION -->
+        <section id="pricing" class="py-20 lg:py-32 bg-slate-900 border-t border-b border-indigo-900/50" aria-labelledby="pricing-heading">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="text-center mb-16">
+                    <h2 id="pricing-heading" class="text-3xl sm:text-4xl font-bold text-white mb-4 pricing-heading">
+                        Simple, Scalable Pricing
+                    </h2>
+                    <p class="text-lg text-gray-400 lg:max-w-3xl mx-auto pricing-subheading">
+                        Choose the plan that fits your content volume. No hidden fees, cancel anytime.
+                    </p>
+                </div>
+
+                <!-- Pricing Grid -->
+                <div class="grid lg:grid-cols-3 gap-8 items-stretch">
+                    
+                    <!-- Plan 1: Starter -->
+                    <div class="price-card flex flex-col p-8 bg-dark-slate rounded-xl shadow-2xl border border-indigo-800 transition duration-300 hover:scale-[1.01]">
+                        <h3 class="text-2xl font-semibold text-white">Starter</h3>
+                        <p class="mt-4 text-gray-400">For individuals and small teams starting out.</p>
+                        <p class="mt-6">
+                            <span class="text-5xl font-extrabold text-white">$29</span>
+                            <span class="text-xl font-medium text-gray-400">/month</span>
+                        </p>
+                        <a href="#subscribe-starter" class="mt-8 block w-full text-center py-3 border border-transparent text-base font-medium rounded-lg text-white bg-indigo-700 hover:bg-indigo-800 transition duration-300">
+                            Start Now
+                        </a>
+                        
+                        <ul role="list" class="mt-8 space-y-4 text-gray-300 flex-grow">
+                            <li class="flex items-start">
+                                <svg class="flex-shrink-0 w-6 h-6 text-green-400 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                                <span>50,000 AI words/month</span>
+                            </li>
+                            <li class="flex items-start">
+                                <svg class="flex-shrink-0 w-6 h-6 text-green-400 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                                <span>Access to 50+ Templates</span>
+                            </li>
+                            <li class="flex items-start">
+                                <svg class="flex-shrink-0 w-6 h-6 text-green-400 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                                <span>Basic SEO Analysis</span>
+                            </li>
+                        </ul>
+                    </div>
+
+                    <!-- Plan 2: Pro (Highlight) -->
+                    <div class="price-card flex flex-col p-8 bg-primary-indigo/10 rounded-xl shadow-2xl border-4 border-primary-indigo transform scale-[1.03] transition duration-500">
+                        <p class="w-min text-sm font-bold text-white bg-primary-indigo px-3 py-1 rounded-full mb-4">Most Popular</p>
+                        <h3 class="text-3xl font-bold text-white">Pro</h3>
+                        <p class="mt-4 text-gray-300">The best choice for growing agencies and marketing teams.</p>
+                        <p class="mt-6">
+                            <span class="text-5xl font-extrabold text-white">$79</span>
+                            <span class="text-xl font-medium text-gray-400">/month</span>
+                        </p>
+                        <a href="#subscribe-pro" class="mt-8 block w-full text-center py-4 border border-transparent text-lg font-bold rounded-lg shadow-lg text-white bg-primary-indigo hover:bg-indigo-600 transition duration-300 transform hover:scale-[1.02]">
+                            Choose Pro
+                        </a>
+                        
+                        <ul role="list" class="mt-8 space-y-4 text-gray-200 flex-grow">
+                            <li class="flex items-start">
+                                <svg class="flex-shrink-0 w-6 h-6 text-green-400 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                                <span><strong class="text-white">Unlimited</strong> AI words</span>
+                            </li>
+                            <li class="flex items-start">
+                                <svg class="flex-shrink-0 w-6 h-6 text-green-400 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                                <span>All 100+ Templates</span>
+                            </li>
+                            <li class="flex items-start">
+                                <svg class="flex-shrink-0 w-6 h-6 text-green-400 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                                <span>Advanced Plagiarism Check</span>
+                            </li>
+                            <li class="flex items-start">
+                                <svg class="flex-shrink-0 w-6 h-6 text-green-400 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                                <span>Priority Support</span>
+                            </li>
+                        </ul>
+                    </div>
+
+                    <!-- Plan 3: Enterprise -->
+                    <div class="price-card flex flex-col p-8 bg-dark-slate rounded-xl shadow-2xl border border-indigo-800 transition duration-300 hover:scale-[1.01]">
+                        <h3 class="text-2xl font-semibold text-white">Enterprise</h3>
+                        <p class="mt-4 text-gray-400">Custom solutions for large organizations with unique needs.</p>
+                        <p class="mt-6">
+                            <span class="text-5xl font-extrabold text-white">Custom</span>
+                        </p>
+                        <a href="#subscribe-enterprise" class="mt-8 block w-full text-center py-3 border border-indigo-500 text-base font-medium rounded-lg text-primary-indigo hover:bg-indigo-900 transition duration-300">
+                            Contact Sales
+                        </a>
+                        
+                        <ul role="list" class="mt-8 space-y-4 text-gray-300 flex-grow">
+                            <li class="flex items-start">
+                                <svg class="flex-shrink-0 w-6 h-6 text-green-400 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                                <span>Dedicated AI Model Training</span>
+                            </li>
+                            <li class="flex items-start">
+                                <svg class="flex-shrink-0 w-6 h-6 text-green-400 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                                <span>SLA & Uptime Guarantee</span>
+                            </li>
+                            <li class="flex items-start">
+                                <svg class="flex-shrink-0 w-6 h-6 text-green-400 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                                <span>Advanced Integrations</span>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- CONTACT SECTION -->
+        <section id="contact" class="py-20 lg:py-32" aria-labelledby="contact-heading">
+            <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="text-center mb-12">
+                    <h2 id="contact-heading" class="text-3xl sm:text-4xl font-bold text-white mb-4 contact-heading">
+                        Ready to Transform Your Workflow?
+                    </h2>
+                    <p class="text-lg text-gray-400 contact-subheading">
+                        Send us a message and we'll get back to you within one business day.
+                    </p>
+                </div>
+
+                <!-- Contact Form -->
+                <form class="space-y-6 form-animate" method="POST" action="/submit-form">
+                    <div>
+                        <label for="full-name" class="block text-sm font-medium text-gray-300">Full Name</label>
+                        <input type="text" name="full-name" id="full-name" autocomplete="name" required
+                               class="mt-1 block w-full px-4 py-3 bg-slate-800 border border-slate-700 rounded-lg text-white placeholder-gray-500 focus:ring-primary-indigo focus:border-primary-indigo shadow-sm" aria-required="true">
+                    </div>
+                    
+                    <div>
+                        <label for="email" class="block text-sm font-medium text-gray-300">Email Address</label>
+                        <input type="email" name="email" id="email" autocomplete="email" required
+                               class="mt-1 block w-full px-4 py-3 bg-slate-800 border border-slate-700 rounded-lg text-white placeholder-gray-500 focus:ring-primary-indigo focus:border-primary-indigo shadow-sm" aria-required="true">
+                    </div>
+
+                    <div>
+                        <label for="message" class="block text-sm font-medium text-gray-300">How can we help?</label>
+                        <textarea id="message" name="message" rows="4" required
+                                  class="mt-1 block w-full px-4 py-3 bg-slate-800 border border-slate-700 rounded-lg text-white placeholder-gray-500 focus:ring-primary-indigo focus:border-primary-indigo shadow-sm" aria-required="true"></textarea>
+                    </div>
+
+                    <div class="pt-4">
+                        <button type="submit" class="w-full flex justify-center py-3 px-4 border border-transparent rounded-lg shadow-sm text-base font-medium text-white bg-primary-indigo hover:bg-indigo-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-indigo transition duration-300 transform hover:scale-[1.01]">
+                            Send Message
+                        </button>
+                    </div>
+                    <p class="text-xs text-center text-gray-500 pt-2">
+                        We respect your privacy. By submitting, you agree to our <a href="#privacy" class="text-indigo-400 hover:text-primary-indigo">Privacy Policy</a>.
+                    </p>
+                </form>
+            </div>
+        </section>
+    </main>
+
+    <!-- FOOTER -->
+    <footer class="bg-slate-900 border-t border-indigo-900/50 mt-12" aria-labelledby="footer-heading">
+        <h2 id="footer-heading" class="sr-only">Footer</h2>
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+            <div class="grid md:grid-cols-4 gap-8">
+                
+                <!-- Branding/Info -->
+                <div>
+                    <h3 class="text-2xl font-bold text-primary-indigo mb-4">Synapse AI</h3>
+                    <p class="text-gray-400 text-sm">AI-powered content generation for the modern web.</p>
+                    <div class="mt-4 flex space-x-4">
+                        <!-- Social Icons (Placeholder) -->
+                        <a href="#" class="text-gray-400 hover:text-primary-indigo transition"><span class="sr-only">Twitter</span>[T]</a>
+                        <a href="#" class="text-gray-400 hover:text-primary-indigo transition"><span class="sr-only">LinkedIn</span>[L]</a>
+                    </div>
+                </div>
+
+                <!-- Quick Links -->
+                <div>
+                    <h3 class="text-base font-semibold text-white tracking-wider uppercase mb-4">Product</h3>
+                    <ul role="list" class="space-y-3">
+                        <li><a href="#features" class="text-sm text-gray-400 hover:text-white transition">Features</a></li>
+                        <li><a href="#pricing" class="text-sm text-gray-400 hover:text-white transition">Pricing</a></li>
+                        <li><a href="#contact" class="text-sm text-gray-400 hover:text-white transition">Contact Sales</a></li>
+                    </ul>
+                </div>
+
+                <!-- Company -->
+                <div>
+                    <h3 class="text-base font-semibold text-white tracking-wider uppercase mb-4">Company</h3>
+                    <ul role="list" class="space-y-3">
+                        <li><a href="#about" class="text-sm text-gray-400 hover:text-white transition">About Us</a></li>
+                        <li><a href="#careers" class="text-sm text-gray-400 hover:text-white transition">Careers</a></li>
+                        <li><a href="#terms" class="text-sm text-gray-400 hover:text-white transition">Terms & Privacy</a></li>
+                    </ul>
+                </div>
+
+                <!-- Legal -->
+                <div>
+                    <h3 class="text-base font-semibold text-white tracking-wider uppercase mb-4">Support</h3>
+                    <ul role="list" class="space-y-3">
+                        <li><a href="#faq" class="text-sm text-gray-400 hover:text-white transition">FAQ</a></li>
+                        <li><a href="mailto:support@synapseai.com" class="text-sm text-gray-400 hover:text-white transition">Email Support</a></li>
+                        <li><a href="#status" class="text-sm text-gray-400 hover:text-white transition">System Status</a></li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Copyright -->
+            <div class="mt-12 border-t border-indigo-900/50 pt-8">
+                <p class="text-base text-gray-500 text-center">&copy; 2024 Synapse AI. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- JAVASCRIPT & FRAMER MOTION (GSAP) IMPLEMENTATION -->
+    <script>
+        
+        // 1. Mobile Menu Toggle
+        document.getElementById('menu-button').addEventListener('click', function() {
+            const menu = document.getElementById('mobile-menu');
+            const isExpanded = this.getAttribute('aria-expanded') === 'true' || false;
+            this.setAttribute('aria-expanded', !isExpanded);
+            menu.classList.toggle('hidden');
+        });
+
+        // 2. GSAP/Framer Motion Animations
+        document.addEventListener("DOMContentLoaded", () => {
+            gsap.registerPlugin(ScrollTrigger);
+
+            // --- A. HERO SECTION ANIMATION (Initial Load) ---
+            const tl = gsap.timeline();
+            
+            tl.from(".hero-badge", { opacity: 0, y: 20, duration: 0.6, ease: "power3.out" })
+              .from(".hero-title", { opacity: 0, y: 30, duration: 0.8, ease: "power3.out" }, "<0.1")
+              .from(".hero-subtitle", { opacity: 0, y: 30, duration: 0.7, ease: "power3.out" }, "<0.2")
+              .from(".hero-cta a", { opacity: 0, scale: 0.9, stagger: 0.2, duration: 0.6, ease: "back.out(1.2)" }, "<0.2")
+              .from(".hero-image", { opacity: 0, y: 80, scale: 0.9, duration: 1.2, ease: "elastic.out(1, 0.5)" }, "<0.3");
+
+            // --- B. GENERIC SCROLL ANIMATION (Features, Pricing, Testimonials) ---
+            
+            // Function to apply stagger scroll animation
+            const applyScrollFade = (selector, start) => {
+                gsap.from(selector, {
+                    opacity: 0,
+                    y: 50,
+                    stagger: 0.15,
+                    duration: 0.8,
+                    ease: "power2.out",
+                    scrollTrigger: {
+                        trigger: selector,
+                        start: start || "top 85%", // Default start point
+                        toggleActions: "play none none reverse",
+                    }
+                });
+            };
+
+            // Features Section
+            applyScrollFade(".feature-item");
+            applyScrollFade(".feature-heading", "top 95%");
+            applyScrollFade(".feature-subheading", "top 95%");
+
+            // Testimonials Section
+            applyScrollFade(".testimonial-card");
+            applyScrollFade(".testimonial-heading", "top 95%");
+            applyScrollFade(".testimonial-subheading", "top 95%");
+
+            // Pricing Section
+            applyScrollFade(".price-card");
+            applyScrollFade(".pricing-heading", "top 95%");
+            applyScrollFade(".pricing-subheading", "top 95%");
+
+            // Contact Section
+            // We animate the form wrapper and the headline/subtitle
+            gsap.from(".contact-heading, .contact-subheading", {
+                opacity: 0, y: 40, stagger: 0.2,
+                scrollTrigger: { trigger: "#contact", start: "top 85%", toggleActions: "play none none reverse" }
+            });
+            gsap.from(".form-animate > div, .form-animate button", {
+                opacity: 0, y: 20, stagger: 0.1,
+                scrollTrigger: { trigger: ".form-animate", start: "top 80%", toggleActions: "play none none reverse" }
+            });
+
+        });
+    </script>
+
+</body>
+</html>
