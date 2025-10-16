@@ -22,6 +22,10 @@ const model = new ChatGoogleGenerativeAI({
 
 import fs from "fs";
 
+app.get("/health", (req, res) => {
+  res.send("Server is healthy");
+});
+
 app.get("/", (req, res) => {
   res.sendFile(`${process.cwd()}/public/index.html`);
 });
